@@ -24,8 +24,13 @@ export class EnvBuilder {
 		let envMap: EnvMap = {};
 		for (const file of this.inputFiles) {
 			const parser = new Parser();
-			const inputEnvMap = await parser.parse(file);
-			envMap = { ...envMap, ...inputEnvMap };
+			try {
+				const inputEnvMap = await parser.parse(file);
+				envMap = { ...envMap, ...inputEnvMap };
+			} catch (err) {
+				if (err.code === "ENOENT") continue;
+				throw err;
+			}
 		}
 
 		const compiler = new Compiler();
@@ -58,7 +63,7 @@ export class EnvBuilder {
 		const program = new Command();
 		const collect = (b: string, a: string[]) => a.concat(b);
 		program
-			.command("generate")
+			.command("generate", { isDefault: true })
 			.option("-t, --template [file]", "Template file to use")
 			.option("-i, --input [file]", "Input env file", collect, [])
 			.option("-o, --output [file]", "Output file")
@@ -77,6 +82,7 @@ export class EnvBuilder {
 					console.log(await builder.output());
 				}
 			});
+
 		program.parse(args);
 	}
 }
