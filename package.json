@@ -1,0 +1,7 @@
+{
+  "name": "@renanhangai/env-builder",
+  "version": "0.0.0",
+  "description": "Build env files",
+  "main": "dist/index.js",
+  "license": "MIT"
+}
