@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/renanhangai/env-builder/compare/v0.1.2...v0.1.3) (2020-02-07)
+
+
+### Features
+
+* Added dependency compilation of templates ([2f096ba](https://github.com/renanhangai/env-builder/commit/2f096ba86d3083244a923d382e9367fa9f97cfaf))
+
 ### [0.1.2](https://github.com/renanhangai/env-builder/compare/v0.1.1...v0.1.2) (2020-02-07)
 
 
