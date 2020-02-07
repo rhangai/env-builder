@@ -1,6 +1,5 @@
-import { Command } from "commander";
 import { EnvMapCompiled, EnvFile } from "./Types";
-import { readFile } from "fs-extra";
+import { readFile } from "./util/Filesystem";
 
 /**
  *
@@ -9,7 +8,7 @@ export class Template {
 	async transpile(file: EnvFile, env: EnvMapCompiled): Promise<string> {
 		let content: string | null = null;
 		if ("filename" in file) {
-			content = await readFile(file.filename, "utf8");
+			content = await readFile(file.filename);
 		} else if ("content" in file) {
 			content = file.content;
 		}

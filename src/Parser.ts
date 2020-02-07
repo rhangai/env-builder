@@ -1,6 +1,6 @@
 import { EnvMap, EnvEntry, EnvFile } from "./Types";
 import { parse as envParse } from "dotenv";
-import { readFile } from "fs-extra";
+import { readFile } from "./util/Filesystem";
 
 /**
  * Parse envfiles
@@ -9,7 +9,7 @@ export class Parser {
 	async parse(file: EnvFile): Promise<EnvMap> {
 		let content: string = null;
 		if ("filename" in file) {
-			content = await readFile(file.filename, "utf8");
+			content = await readFile(file.filename);
 		} else if ("content" in file) {
 			content = file.content;
 		}

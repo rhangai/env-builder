@@ -3,7 +3,7 @@ import { EnvFile, EnvMapCompiled, EnvMap } from "./Types";
 import { Parser } from "./Parser";
 import { Compiler } from "./Compiler";
 import { Template } from "./Template";
-import { writeFile } from "fs-extra";
+import { writeFile } from "./util/Filesystem";
 
 /**
  *
