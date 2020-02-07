@@ -59,7 +59,7 @@ export class Template {
 
 	private parseEnvLine(line: string) {
 		line = line.trim();
-		const lineMatch = line.match(/^([a-zA-Z0-9_])\s*\=/);
+		const lineMatch = line.match(/^([a-zA-Z0-9_]+)\s*\=/);
 		if (lineMatch) {
 			return { key: lineMatch[1] };
 		}

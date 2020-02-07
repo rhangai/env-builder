@@ -1,5 +1,6 @@
 import { runInNewContext } from "vm";
 import { EnvEntry, EnvMap, EnvMapCompiled } from "./Types";
+import { DepGraph } from "dependency-graph";
 
 /**
  * Compile the environment variables
@@ -21,18 +22,22 @@ export class Compiler {
 
 	/// Compile the variables
 	async compile(): Promise<EnvMapCompiled> {
-		const currentEnv: EnvMapCompiled = {};
+		let currentEnv: EnvMapCompiled = {};
 		const expressionMap: { [key: string]: string } = {};
+		const stringValueEnvs: string[] = [];
+
 		for (const key in this.envMap) {
 			const entry = this.envMap[key];
 			if (!entry) continue;
 			if ("value" in entry) {
 				currentEnv[key] = entry.value;
+				stringValueEnvs.push(key);
 			} else if (entry.expression) {
 				expressionMap[key] = entry.expression;
 			}
 		}
 
+		// Compile every env expression
 		for (const key in expressionMap) {
 			const value = await this.compileExpression(
 				currentEnv,
@@ -40,6 +45,13 @@ export class Compiler {
 			);
 			currentEnv[key] = value;
 		}
+
+		// Compile every string value environment variable
+		currentEnv = await this.compileStringValues(
+			currentEnv,
+			stringValueEnvs
+		);
+
 		return currentEnv;
 	}
 
@@ -54,5 +66,55 @@ export class Compiler {
 		const result = await runInNewContext(expression, context);
 		if (result === false) return false;
 		return `${result}`;
+	}
+	/// Compile a single value
+	private async compileStringValues(
+		env: EnvMapCompiled,
+		envList: string[]
+	): Promise<EnvMapCompiled> {
+		env = { ...env };
+
+		// Create the nodes as every env
+		const depGraph = new DepGraph();
+		for (const envName in env) {
+			depGraph.addNode(envName);
+		}
+
+		const envReplaces: { [key: string]: string[] } = {};
+
+		// Get every dependency by checking for the environment variables
+		for (const envName of envList) {
+			const envValue = env[envName];
+			if (envValue === false) continue;
+			const matches = envValue.match(/\$\{[a-zA-Z0-9_]+\}/g);
+			if (!matches) continue;
+
+			for (const match of matches) {
+				const matchEnvName = match.substr(2, match.length - 3);
+				if (!depGraph.hasNode(matchEnvName)) continue;
+				depGraph.addDependency(envName, matchEnvName);
+				envReplaces[envName] = envReplaces[envName] || [];
+				envReplaces[envName].push(matchEnvName);
+			}
+		}
+
+		// Replaces the variables using the dependency order
+		const overallOrder = depGraph.overallOrder();
+		for (const envName of overallOrder) {
+			let envValue = env[envName];
+			if (envValue === false) continue;
+			const replaces = envReplaces[envName];
+			if (!replaces) continue;
+			for (const dependencyEnvName of replaces) {
+				const dependencyEnvValue = env[dependencyEnvName];
+				if (dependencyEnvValue === false) continue;
+				envValue = envValue.replace(
+					"${" + dependencyEnvName + "}",
+					dependencyEnvValue
+				);
+			}
+			env[envName] = envValue;
+		}
+		return env;
 	}
 }
