@@ -1,7 +1,7 @@
 {
   "name": "@renanhangai/env-builder",
   "version": "0.0.0",
-  "description": "Build env files",
+  "description": "Create .env files for your projects with a single command",
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
@@ -26,5 +26,7 @@
     "build:clean": "rimraf dist",
     "build:compile": "tsc",
     "build:watch": "run-s 'build:clean' 'build:compile --watch'"
-  }
+  },
+  "repository": "git@github.com:renanhangai/env-builder.git",
+  "author": "renanhangai <hangai.renan@gmail.com>"
 }

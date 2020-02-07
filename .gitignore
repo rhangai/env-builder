@@ -4,6 +4,9 @@
 *\#
 \#*
 
+# Log files
+yarn-error.log
+
 # Vendor files
 node_modules
 
