@@ -1,0 +1,11 @@
+# Tmp files
+*~
+.\#*
+*\#
+\#*
+
+# Vendor files
+node_modules
+
+# Build files
+dist

@@ -1,0 +1,68 @@
+import { Command } from "commander";
+import { EnvMapCompiled, EnvFile } from "./Types";
+import { readFile } from "fs-extra";
+
+/**
+ *
+ */
+export class Template {
+	async transpile(file: EnvFile, env: EnvMapCompiled): Promise<string> {
+		let content: string | null = null;
+		if ("filename" in file) {
+			content = await readFile(file.filename, "utf8");
+		} else if ("content" in file) {
+			content = file.content;
+		}
+		if (content === null) throw new Error(`Invalid file`);
+		return this.transpileContent(content, env);
+	}
+
+	private async transpileContent(
+		content: string,
+		env: EnvMapCompiled
+	): Promise<string> {
+		const lines = content.split(/\n/);
+		const output: string[] = [];
+
+		const usedEnvs: { [key: string]: true } = {};
+		for (const line of lines) {
+			const envLine = this.parseEnvLine(line);
+			if (!envLine) {
+				output.push(line);
+				continue;
+			}
+
+			const envName = envLine.key;
+			const envValue = env[envName];
+			usedEnvs[envName] = true;
+			if (envValue !== false) {
+				output.push(`${envName}=${env[envName]}`);
+			}
+		}
+
+		let hasOtherVars = false;
+		for (const envName in env) {
+			const envValue = env[envName];
+			if (!usedEnvs[envName]) {
+				if (!hasOtherVars) {
+					output.push("");
+					output.push("# Other vars");
+				}
+				hasOtherVars = true;
+				if (envValue !== false) {
+					output.push(`${envName}=${env[envName]}`);
+				}
+			}
+		}
+		return output.join("\n");
+	}
+
+	private parseEnvLine(line: string) {
+		line = line.trim();
+		const lineMatch = line.match(/^([\S+?])\s*\=/);
+		if (lineMatch) {
+			return { key: lineMatch[1] };
+		}
+		return false;
+	}
+}
