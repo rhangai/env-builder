@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/renanhangai/env-builder/compare/v0.2.0...v0.3.0) (2020-02-08)
+
+
+### Features
+
+* Added support for package.json ([c10f6f1](https://github.com/renanhangai/env-builder/commit/c10f6f1c9c6b73d722087e469b8a28b4fcf660ed))
+
 ## [0.2.0](https://github.com/renanhangai/env-builder/compare/v0.1.4...v0.2.0) (2020-02-08)
 
 
