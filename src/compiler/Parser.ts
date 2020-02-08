@@ -1,6 +1,6 @@
-import { EnvMap, EnvEntry, EnvFile } from "./Types";
+import { EnvMap, EnvEntry, EnvFile } from "../Types";
 import { parse as envParse } from "dotenv";
-import { readFile } from "./util/Filesystem";
+import { readFile } from "../util/Filesystem";
 
 /**
  * Parse envfiles

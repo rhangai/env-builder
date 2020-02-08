@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { EnvFile, EnvMapCompiled, EnvMap } from "./Types";
-import { Parser } from "./Parser";
-import { Compiler } from "./Compiler";
-import { Template } from "./Template";
+import { Parser } from "./compiler/Parser";
+import { Compiler } from "./compiler/Compiler";
+import { TemplateCompiler } from "./compiler/TemplateCompiler";
 import { writeFile } from "./util/Filesystem";
 
 /**
@@ -11,9 +11,14 @@ import { writeFile } from "./util/Filesystem";
 export class EnvBuilder {
 	private inputFiles: EnvFile[] = [];
 	private templateFile: EnvFile = null;
+	private contextFilename: string = null;
 
 	setTemplate(file: EnvFile) {
 		this.templateFile = file;
+	}
+
+	setContext(filename: string) {
+		this.contextFilename = filename;
 	}
 
 	addFile(file: EnvFile) {
@@ -34,6 +39,7 @@ export class EnvBuilder {
 		}
 
 		const compiler = new Compiler();
+		compiler.setContext(this.contextFilename);
 		compiler.addMap(envMap);
 		return compiler.compile();
 	}
@@ -46,8 +52,11 @@ export class EnvBuilder {
 	async output(): Promise<string> {
 		const env = await this.compile();
 		if (this.templateFile) {
-			const template = new Template();
-			const content = await template.transpile(this.templateFile, env);
+			const templateCompiler = new TemplateCompiler();
+			const content = await templateCompiler.compile(
+				this.templateFile,
+				env
+			);
 			return content;
 		}
 
@@ -64,11 +73,15 @@ export class EnvBuilder {
 		const collect = (b: string, a: string[]) => a.concat(b);
 		program
 			.command("generate", { isDefault: true })
+			.option("--context [file]", "Context file to use")
 			.option("-t, --template [file]", "Template file to use")
 			.option("-i, --input [file]", "Input env file", collect, [])
 			.option("-o, --output [file]", "Output file")
 			.action(async options => {
 				const builder = new EnvBuilder();
+				if (options.context) {
+					builder.setContext(options.context);
+				}
 				if (options.template) {
 					builder.addFile({ filename: options.template });
 					builder.setTemplate({ filename: options.template });

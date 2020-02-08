@@ -1,12 +1,20 @@
 import { runInNewContext } from "vm";
-import { EnvEntry, EnvMap, EnvMapCompiled } from "./Types";
+import { EnvEntry, EnvMap, EnvMapCompiled, EnvFile } from "../Types";
 import { DepGraph } from "dependency-graph";
+import { CompilerContext } from "./CompilerContext";
 
 /**
  * Compile the environment variables
  */
 export class Compiler {
 	private envMap: EnvMap = {};
+	private contextFilename: string;
+	private context: CompilerContext = new CompilerContext();
+
+	/// Set the context
+	setContext(filename: string) {
+		this.contextFilename = filename;
+	}
 
 	/// Add a new variable to be compiled
 	add(key: string, entry: EnvEntry) {
@@ -22,6 +30,8 @@ export class Compiler {
 
 	/// Compile the variables
 	async compile(): Promise<EnvMapCompiled> {
+		await this.context.setup(this.contextFilename);
+
 		let currentEnv: EnvMapCompiled = {};
 		const expressionMap: { [key: string]: string } = {};
 		const stringValueEnvs: string[] = [];
@@ -38,12 +48,13 @@ export class Compiler {
 		}
 
 		// Compile every env expression
-		for (const key in expressionMap) {
+		for (const envName in expressionMap) {
 			const value = await this.compileExpression(
 				currentEnv,
-				expressionMap[key]
+				envName,
+				expressionMap[envName]
 			);
-			currentEnv[key] = value;
+			currentEnv[envName] = value;
 		}
 
 		// Compile every string value environment variable
@@ -58,11 +69,10 @@ export class Compiler {
 	/// Compile a single expression
 	private async compileExpression(
 		env: EnvMapCompiled,
+		envName: string,
 		expression: string
 	): Promise<string | false> {
-		const context = {
-			env: { ...env }
-		};
+		const context = await this.context.create(env, envName);
 		const result = await runInNewContext(expression, context);
 		if (result === false) return false;
 		return `${result}`;

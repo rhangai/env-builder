@@ -1,11 +1,11 @@
-import { EnvMapCompiled, EnvFile } from "./Types";
-import { readFile } from "./util/Filesystem";
+import { EnvMapCompiled, EnvFile } from "../Types";
+import { readFile } from "../util/Filesystem";
 
 /**
  *
  */
-export class Template {
-	async transpile(file: EnvFile, env: EnvMapCompiled): Promise<string> {
+export class TemplateCompiler {
+	async compile(file: EnvFile, env: EnvMapCompiled): Promise<string> {
 		let content: string | null = null;
 		if ("filename" in file) {
 			content = await readFile(file.filename);
@@ -13,10 +13,10 @@ export class Template {
 			content = file.content;
 		}
 		if (content === null) throw new Error(`Invalid file`);
-		return this.transpileContent(content, env);
+		return this.compileContent(content, env);
 	}
 
-	private async transpileContent(
+	private async compileContent(
 		content: string,
 		env: EnvMapCompiled
 	): Promise<string> {
