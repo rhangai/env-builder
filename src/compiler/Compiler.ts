@@ -10,10 +10,16 @@ export class Compiler {
 	private envMap: EnvMap = {};
 	private contextFilename: string;
 	private context: CompilerContext = new CompilerContext();
+	private envOverridePrefix: string = null;
 
 	/// Set the context
 	setContext(filename: string) {
 		this.contextFilename = filename;
+	}
+
+	/// Set the Env Override Prefix
+	setEnvOverridePrefix(envOverridePrefix: string) {
+		this.envOverridePrefix = envOverridePrefix;
 	}
 
 	/// Add a new variable to be compiled
@@ -36,14 +42,23 @@ export class Compiler {
 		const expressionMap: { [key: string]: string } = {};
 		const stringValueEnvs: string[] = [];
 
-		for (const key in this.envMap) {
-			const entry = this.envMap[key];
+		for (const envName in this.envMap) {
+			const entry = this.envMap[envName];
 			if (!entry) continue;
+
+			// Override the environment using the variables from the current env but prefixed
+			if (this.envOverridePrefix) {
+				const overrideEnvName = `${this.envOverridePrefix}${envName}`;
+				if (overrideEnvName in process.env) {
+					currentEnv[envName] = process.env[overrideEnvName];
+					continue;
+				}
+			}
 			if ("value" in entry) {
-				currentEnv[key] = entry.value;
-				stringValueEnvs.push(key);
+				currentEnv[envName] = entry.value;
+				stringValueEnvs.push(envName);
 			} else if (entry.expression) {
-				expressionMap[key] = entry.expression;
+				expressionMap[envName] = entry.expression;
 			}
 		}
 

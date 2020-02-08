@@ -14,6 +14,7 @@ export class EnvBuilder {
 	private inputLocalFiles: EnvFile[] = [];
 	private templateFile: EnvFile = null;
 	private contextFilename: string = null;
+	private envOverridePrefix: string = null;
 
 	setTemplate(file: EnvFile) {
 		this.templateFile = file;
@@ -31,6 +32,10 @@ export class EnvBuilder {
 		this.inputLocalFiles.push(file);
 	}
 
+	setEnvOverridePrefix(envOverridePrefix: string) {
+		this.envOverridePrefix = envOverridePrefix;
+	}
+
 	/**
 	 * Read the data from a package.json
 	 * @param pkgFile
@@ -38,8 +43,7 @@ export class EnvBuilder {
 	 */
 	async readFromPackage(
 		pkgFile: string | boolean,
-		mode: string,
-		packageModeRequired: boolean
+		mode: string
 	): Promise<null | any> {
 		if (!pkgFile) return null;
 		const isRequired = pkgFile != null;
@@ -78,18 +82,18 @@ export class EnvBuilder {
 		if (envBuilderData.output) {
 			result.output = path.resolve(pkgDir, envBuilderData.output);
 		}
-		if (packageModeRequired) {
+		if (envBuilderData.modes) {
+			mode = mode || "dev";
 			const modes = envBuilderData.modes
 				? Object.keys(envBuilderData.modes)
 				: [];
-			if (!mode || modes.indexOf(mode) < 0)
+			if (modes.indexOf(mode) < 0) {
 				throw new Error(
-					`Mode is required required. Modes available: ${modes
+					`Mode ${mode} does not exist. Modes available: ${modes
 						.map(m => `"${m}"`)
 						.join(", ")}`
 				);
-		}
-		if (envBuilderData.modes && envBuilderData.modes[mode]) {
+			}
 			const inputFiles = [].concat(envBuilderData.modes[mode]);
 			for (const input of inputFiles) {
 				this.addFile({ filename: path.resolve(pkgDir, input) });
@@ -123,6 +127,7 @@ export class EnvBuilder {
 		const compiler = new Compiler();
 		compiler.setContext(this.contextFilename);
 		compiler.addMap(envMap);
+		compiler.setEnvOverridePrefix(this.envOverridePrefix);
 		return compiler.compile();
 	}
 
@@ -162,7 +167,6 @@ export class EnvBuilder {
 			.option("--context <file>", "Context file to use")
 			.option("-t, --template <file>", "Template file to use")
 			.option("-i, --input <file>", "Input env file", collect, [])
-			.option("--package-mode-required", "Force the use of a mode")
 			.option(
 				"-l, --local <file>",
 				"Input local env file. Always the last input"
@@ -174,14 +178,17 @@ export class EnvBuilder {
 				false
 			)
 			.option("--no-package", "Don't use a package.json")
+			.option(
+				"--env-override-prefix <prefix>",
+				"Sets a prefix to allow the variables to be overwritten by the current env. Useful for ci"
+			)
 			.action(async (mode, options) => {
 				try {
 					const builder = new EnvBuilder();
 
 					const packageResult = await builder.readFromPackage(
 						options.package,
-						mode,
-						options.packageModeRequired
+						mode
 					);
 					if (options.context) {
 						builder.setContext(options.context);
@@ -194,6 +201,9 @@ export class EnvBuilder {
 					}
 					if (options.local) {
 						builder.addFile({ filename: options.local });
+					}
+					if (options.envOverridePrefix) {
+						builder.setEnvOverridePrefix(options.envOverridePrefix);
 					}
 					let output = packageResult ? packageResult.output : null;
 					if (options.output) output = options.output;
