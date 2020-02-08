@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.2](https://github.com/renanhangai/env-builder/compare/v0.3.1...v0.3.2) (2020-02-08)
+
+
+### Features
+
+* Added environment variable override ([6cccdd2](https://github.com/renanhangai/env-builder/commit/6cccdd20c92b7902c53d49b382dc3b2b1838a7f4))
+
 ### [0.3.1](https://github.com/renanhangai/env-builder/compare/v0.3.0...v0.3.1) (2020-02-08)
 
 
