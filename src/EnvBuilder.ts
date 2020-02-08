@@ -204,6 +204,7 @@ export class EnvBuilder {
 					}
 				} catch (err) {
 					console.error(err.message);
+					process.exit(1);
 				}
 			});
 
