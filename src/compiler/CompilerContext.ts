@@ -2,7 +2,7 @@ import { EnvMapCompiled, EnvFile } from "../Types";
 //@ts-ignore
 import * as format from "nanoid/format";
 import { MersenneTwister } from "../util/MersenneTwister";
-import { readFile, writeFile } from "../util/Filesystem";
+import { machineId } from "node-machine-id";
 
 const DEFAULT_ALPHABET =
 	"0123456789abcdefghijklmnopqrstuvwxyzABCDEFHIJKLMNOPQRSTUVXYZ_";
@@ -17,24 +17,12 @@ export class CompilerContext {
 	 *
 	 * @param file
 	 */
-	async setup(filename?: string) {
-		const prng = new MersenneTwister();
-		const data = await this.loadContextData(filename);
-		this.data.seed = data.seed || this.getRandom(prng, 128);
-		// save the context if there is
-		if (filename) {
-			await writeFile(filename, JSON.stringify(this.data, null, "  "));
-		}
+	async setup(seed?: string) {
+		this.data.seed = seed || (await machineId());
 	}
-	private async loadContextData(filename: string) {
-		if (!filename) return {};
-		try {
-			const fileContent = await readFile(filename);
-			const data = JSON.parse(fileContent);
-			return data || {};
-		} catch {
-			return {};
-		}
+
+	getSeed(): string {
+		return this.data.seed;
 	}
 	/**
 	 *

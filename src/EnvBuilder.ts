@@ -1,10 +1,11 @@
 import { Command } from "commander";
-import { EnvFile, EnvMapCompiled, EnvMap } from "./Types";
+import { EnvFile, EnvMapCompiled, EnvMap, EnvCompilationResult } from "./Types";
 import { Parser } from "./compiler/Parser";
 import { Compiler } from "./compiler/Compiler";
 import { TemplateCompiler } from "./compiler/TemplateCompiler";
 import { writeFile, readFile } from "./util/Filesystem";
 import * as path from "path";
+import { machineId } from "node-machine-id";
 
 /**
  *
@@ -13,15 +14,25 @@ export class EnvBuilder {
 	private inputFiles: EnvFile[] = [];
 	private inputLocalFiles: EnvFile[] = [];
 	private templateFile: EnvFile = null;
-	private contextFilename: string = null;
+	private seedGetter: (envMap: EnvMap) => string = null;
 	private envOverridePrefix: string = null;
 
 	setTemplate(file: EnvFile) {
 		this.templateFile = file;
 	}
 
-	setContext(filename: string) {
-		this.contextFilename = filename;
+	setSeed(seed: string) {
+		this.seedGetter = () => seed;
+	}
+
+	setSeedEnv(seedEnv: string) {
+		this.seedGetter = env => {
+			const envEntry = env[seedEnv];
+			if (!envEntry) return null;
+			if (!("value" in envEntry))
+				throw new Error(`Env for seed must be constant`);
+			return envEntry.value;
+		};
 	}
 
 	addFile(file: EnvFile) {
@@ -60,8 +71,9 @@ export class EnvBuilder {
 		if (!pkgContent && isRequired) {
 			throw new Error(`Package is required: ${pkgFile}`);
 		}
-		const result: any = {
-			output: null
+		const result = {
+			seed: null as string,
+			output: null as string
 		};
 		const data = JSON.parse(pkgContent);
 		const envBuilderData = data["env-builder"] || {};
@@ -70,8 +82,10 @@ export class EnvBuilder {
 				filename: path.resolve(pkgDir, envBuilderData.template)
 			});
 		}
-		if (envBuilderData.context) {
-			this.setContext(path.resolve(pkgDir, envBuilderData.context));
+		if (envBuilderData.seed) {
+			this.setSeed(envBuilderData.seed);
+		} else {
+			this.setSeed(`${data.name}|${await machineId()}`);
 		}
 		if (envBuilderData.local) {
 			const localFiles = [].concat(envBuilderData.local);
@@ -105,7 +119,7 @@ export class EnvBuilder {
 	/**
 	 * Compile the env and returns the variables as a map
 	 */
-	async compile(): Promise<EnvMapCompiled> {
+	async compile(): Promise<EnvCompilationResult> {
 		let envMap: EnvMap = {};
 
 		const inputFiles = []
@@ -125,7 +139,7 @@ export class EnvBuilder {
 		}
 
 		const compiler = new Compiler();
-		compiler.setContext(this.contextFilename);
+		compiler.setSeed(this.seedGetter ? this.seedGetter(envMap) : null);
 		compiler.addMap(envMap);
 		compiler.setEnvOverridePrefix(this.envOverridePrefix);
 		return compiler.compile();
@@ -133,22 +147,30 @@ export class EnvBuilder {
 
 	/// Write the output to a file
 	async write(filename: string) {
-		const content = await this.output();
-		await writeFile(filename, content);
+		const output = await this.output();
+		filename = filename || "";
+		if (filename) {
+			await writeFile(filename, output.content);
+		}
+		return { filename, ...output };
 	}
 
 	/**
 	 * Generate the output env file as a string
 	 */
-	async output(): Promise<string> {
-		const env = await this.compile();
+	async output(): Promise<EnvCompilationResult & { content: string }> {
+		const { env, seed } = await this.compile();
 		if (this.templateFile) {
 			const templateCompiler = new TemplateCompiler();
 			const content = await templateCompiler.compile(
 				this.templateFile,
 				env
 			);
-			return content;
+			return {
+				env,
+				seed,
+				content: content
+			};
 		}
 
 		const output: string[] = [];
@@ -157,14 +179,18 @@ export class EnvBuilder {
 			if (envValue === false) continue;
 			output.push(`${envName}=${envValue}`);
 		}
-		return output.join("\n");
+		return {
+			env,
+			seed,
+			content: output.join("\n")
+		};
 	}
 	static async main(args: string[]) {
 		const program = new Command();
 		const collect = (b: string, a: string[]) => a.concat(b);
 		program
 			.command("generate [mode]")
-			.option("--context <file>", "Context file to use")
+			.option("-s, --seed <seed>", "The seed to use to generate the data")
 			.option("-t, --template <file>", "Template file to use")
 			.option("-i, --input <file>", "Input env file", collect, [])
 			.option(
@@ -190,8 +216,10 @@ export class EnvBuilder {
 						options.package,
 						mode
 					);
-					if (options.context) {
-						builder.setContext(options.context);
+					if (options.seed) {
+						builder.setSeed(options.seed);
+					} else if (options.seedEnv) {
+						builder.setSeedEnv(options.seedEnv);
 					}
 					if (options.template) {
 						builder.setTemplate({ filename: options.template });
@@ -207,11 +235,9 @@ export class EnvBuilder {
 					}
 					let output = packageResult ? packageResult.output : null;
 					if (options.output) output = options.output;
-					if (output) {
-						await builder.write(output);
-					} else {
-						console.log(await builder.output());
-					}
+					const result = await builder.write(output);
+					console.error(`Seed: ${result.seed}`);
+					console.error(`Generated Env: ${result.filename}`);
 				} catch (err) {
 					console.error(err.message);
 					process.exit(1);

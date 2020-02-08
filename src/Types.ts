@@ -14,6 +14,11 @@ export type EnvMapCompiled = {
 	[key: string]: string | false;
 };
 
+export type EnvCompilationResult = {
+	env: EnvMapCompiled;
+	seed: string;
+};
+
 export type EnvFile =
 	| {
 			filename: string;

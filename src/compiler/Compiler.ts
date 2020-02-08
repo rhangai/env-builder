@@ -1,5 +1,11 @@
 import { runInNewContext } from "vm";
-import { EnvEntry, EnvMap, EnvMapCompiled, EnvFile } from "../Types";
+import {
+	EnvEntry,
+	EnvMap,
+	EnvMapCompiled,
+	EnvFile,
+	EnvCompilationResult
+} from "../Types";
 import { DepGraph } from "dependency-graph";
 import { CompilerContext } from "./CompilerContext";
 
@@ -8,13 +14,13 @@ import { CompilerContext } from "./CompilerContext";
  */
 export class Compiler {
 	private envMap: EnvMap = {};
-	private contextFilename: string;
+	private seed: string;
 	private context: CompilerContext = new CompilerContext();
 	private envOverridePrefix: string = null;
 
 	/// Set the context
-	setContext(filename: string) {
-		this.contextFilename = filename;
+	setSeed(seed: string) {
+		this.seed = seed;
 	}
 
 	/// Set the Env Override Prefix
@@ -35,8 +41,8 @@ export class Compiler {
 	}
 
 	/// Compile the variables
-	async compile(): Promise<EnvMapCompiled> {
-		await this.context.setup(this.contextFilename);
+	async compile(): Promise<EnvCompilationResult> {
+		await this.context.setup(this.seed);
 
 		let currentEnv: EnvMapCompiled = {};
 		const expressionMap: { [key: string]: string } = {};
@@ -78,7 +84,10 @@ export class Compiler {
 			stringValueEnvs
 		);
 
-		return currentEnv;
+		return {
+			env: currentEnv,
+			seed: this.context.getSeed()
+		};
 	}
 
 	/// Compile a single expression
