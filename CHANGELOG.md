@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/renanhangai/env-builder/compare/v0.3.2...v0.4.0) (2020-02-08)
+
+
+### Bug Fixes
+
+* Generation of seed using the machine-id and the project name ([6ed1c07](https://github.com/renanhangai/env-builder/commit/6ed1c077b3f2635351d597d5f91ecda28771f5d1))
+
 ### [0.3.2](https://github.com/renanhangai/env-builder/compare/v0.3.1...v0.3.2) (2020-02-08)
 
 
