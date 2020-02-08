@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/renanhangai/env-builder/compare/v0.1.4...v0.2.0) (2020-02-08)
+
+
+### Features
+
+* Added support for random generation ([d7709f5](https://github.com/renanhangai/env-builder/commit/d7709f589f645fbfbcbb17621361f1c140bf3fac))
+
 ### [0.1.4](https://github.com/renanhangai/env-builder/compare/v0.1.3...v0.1.4) (2020-02-07)
 
 ### [0.1.3](https://github.com/renanhangai/env-builder/compare/v0.1.2...v0.1.3) (2020-02-07)
