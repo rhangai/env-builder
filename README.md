@@ -65,7 +65,7 @@ You can simplify the usage of the scripts simply by creating the `env-builder` e
 	},
 	"env-builder": {
 		"template": "env/template.env",
-		"output": ".env",
+		"output": ".env", // Or array [".env", "output/.env"]
 		"local": ".env.local",
 		"modes": {
 			"dev": ["env/development.env"],
