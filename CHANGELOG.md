@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.1](https://github.com/renanhangai/env-builder/compare/v0.4.0...v0.4.1) (2020-02-09)
+
+
+### Features
+
+* Added multiple output options ([0fafd84](https://github.com/renanhangai/env-builder/commit/0fafd8411d0a939ccca269fc99766b8129ed3fe3))
+
 ## [0.4.0](https://github.com/renanhangai/env-builder/compare/v0.3.2...v0.4.0) (2020-02-08)
 
 
