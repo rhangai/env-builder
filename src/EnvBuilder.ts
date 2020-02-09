@@ -73,7 +73,7 @@ export class EnvBuilder {
 		}
 		const result = {
 			seed: null as string,
-			output: null as string
+			output: [] as string[]
 		};
 		const data = JSON.parse(pkgContent);
 		const envBuilderData = data["env-builder"] || {};
@@ -94,7 +94,8 @@ export class EnvBuilder {
 			}
 		}
 		if (envBuilderData.output) {
-			result.output = path.resolve(pkgDir, envBuilderData.output);
+			let outputs = [].concat(envBuilderData.output).filter(Boolean);
+			result.output = outputs.map(o => path.resolve(pkgDir, o));
 		}
 		if (envBuilderData.modes) {
 			mode = mode || "dev";
@@ -145,14 +146,22 @@ export class EnvBuilder {
 		return compiler.compile();
 	}
 
-	/// Write the output to a file
-	async write(filename: string) {
+	/// Write the output to a list of files
+	async write(filenames: string[] | string) {
 		const output = await this.output();
-		filename = filename || "";
-		if (filename) {
+		filenames = [].concat(filenames).filter(Boolean);
+		filenames = filenames.map(f => (f !== "-" ? path.resolve(f) : "-"));
+		filenames = Array.from(new Set(filenames));
+
+		const stdoutIndex = filenames.findIndex(f => f === "-");
+		const hasStdout = stdoutIndex >= 0;
+		if (hasStdout) {
+			filenames.splice(stdoutIndex, 1);
+		}
+		for (const filename of filenames) {
 			await writeFile(filename, output.content);
 		}
-		return { filename, ...output };
+		return { filenames, hasStdout, ...output };
 	}
 
 	/**
@@ -197,7 +206,7 @@ export class EnvBuilder {
 				"-l, --local <file>",
 				"Input local env file. Always the last input"
 			)
-			.option("-o, --output <file>", "Output file")
+			.option("-o, --output <file>", "Output file", collect, [])
 			.option(
 				"-p, --package [file]",
 				"Reads from the package.json",
@@ -233,11 +242,20 @@ export class EnvBuilder {
 					if (options.envOverridePrefix) {
 						builder.setEnvOverridePrefix(options.envOverridePrefix);
 					}
-					let output = packageResult ? packageResult.output : null;
-					if (options.output) output = options.output;
+					let output: string[] = [];
+					if (packageResult)
+						output = output.concat(packageResult.output);
+					if (options.output) output = output.concat(options.output);
+					output = output.filter(Boolean);
+
 					const result = await builder.write(output);
 					console.error(`Seed: ${result.seed}`);
-					console.error(`Generated Env: ${result.filename}`);
+					console.error(
+						`Generated Env: ${result.filenames.join(";")}`
+					);
+					if (result.hasStdout) {
+						console.log(result.content);
+					}
 				} catch (err) {
 					console.error(err.message);
 					process.exit(1);
