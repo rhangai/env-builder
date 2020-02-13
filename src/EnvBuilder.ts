@@ -208,6 +208,10 @@ export class EnvBuilder {
 			)
 			.option("-o, --output <file>", "Output file", collect, [])
 			.option(
+				"-n, --dry-run",
+				"Only prints the output without writing any file"
+			)
+			.option(
 				"-p, --package [file]",
 				"Reads from the package.json",
 				false
@@ -247,6 +251,9 @@ export class EnvBuilder {
 						output = output.concat(packageResult.output);
 					if (options.output) output = output.concat(options.output);
 					output = output.filter(Boolean);
+					if (options.dryRun) {
+						output = ["-"];
+					}
 
 					const result = await builder.write(output);
 					console.error(`Seed: ${result.seed}`);
