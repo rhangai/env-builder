@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.2](https://github.com/renanhangai/env-builder/compare/v0.4.1...v0.4.2) (2020-02-13)
+
+
+### Features
+
+* Added dry-run option to only output to the terminal ([929206a](https://github.com/renanhangai/env-builder/commit/929206ad30a7c025b398d880785fc303d59a7934))
+
 ### [0.4.1](https://github.com/renanhangai/env-builder/compare/v0.4.0...v0.4.1) (2020-02-09)
 
 

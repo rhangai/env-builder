@@ -1,6 +1,6 @@
 {
   "name": "@renanhangai/env-builder",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Create .env files for your projects with a single command",
   "main": "dist/index.js",
   "license": "MIT",
