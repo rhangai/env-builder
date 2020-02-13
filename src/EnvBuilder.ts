@@ -261,7 +261,9 @@ export class EnvBuilder {
 						`Generated Env: ${result.filenames.join(";")}`
 					);
 					if (result.hasStdout) {
+						console.error("");
 						console.log(result.content);
+						console.error("\n");
 					}
 				} catch (err) {
 					console.error(err.message);
