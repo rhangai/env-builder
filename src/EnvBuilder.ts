@@ -6,6 +6,7 @@ import { TemplateCompiler } from "./compiler/TemplateCompiler";
 import { writeFile, readFile } from "./util/Filesystem";
 import * as path from "path";
 import { machineId } from "node-machine-id";
+import { createHash } from "crypto";
 
 /**
  *
@@ -85,7 +86,10 @@ export class EnvBuilder {
 		if (envBuilderData.seed) {
 			this.setSeed(envBuilderData.seed);
 		} else {
-			this.setSeed(`${data.name}|${await machineId()}`);
+			const seed = createHash("sha256")
+				.update(`${data.name}|${await machineId()}`)
+				.digest("hex");
+			this.setSeed(seed);
 		}
 		if (envBuilderData.local) {
 			const localFiles = [].concat(envBuilderData.local);
