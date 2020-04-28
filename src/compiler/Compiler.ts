@@ -99,8 +99,10 @@ export class Compiler {
 		const context = await this.context.create(env, envName);
 		const result = await runInNewContext(expression, context);
 		if (result === false) return false;
+		if (result == null) return '';
 		return `${result}`;
 	}
+
 	/// Compile a single value
 	private async compileStringValues(
 		env: EnvMapCompiled,
