@@ -54,7 +54,7 @@ The `--env-override-prefix <prefix>` flag is usually combined when using CI. It 
 
 You can simplify the usage of the scripts simply by creating the `env-builder` entry on the package.json file
 
-```json
+```js
 {
 	"devDependencies": {
 		"@renanhangai/env-builder": "^0.4.0"
@@ -76,3 +76,16 @@ You can simplify the usage of the scripts simply by creating the `env-builder` e
 ```
 
 And the running `yarn env`
+
+# Context
+
+The default context contains two main variables `util` and `env`
+
+You can use it in an expression like:
+
+```env
+MY_ENV={{ env.OTHER_ENV + util.random(64) }}
+```
+
+Util:
+- util.random(n, alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFHIJKLMNOPQRSTUVXYZ_'): Generates a random string of length n
