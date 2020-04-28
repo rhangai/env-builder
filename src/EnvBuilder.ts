@@ -36,14 +36,17 @@ export class EnvBuilder {
 		};
 	}
 
+	/// Add a regular env file to the input
 	addFile(file: EnvFile) {
 		this.inputFiles.push(file);
 	}
 
+	/// Add a local file to the input (higher priority on variable values)
 	addLocalFile(file: EnvFile) {
 		this.inputLocalFiles.push(file);
 	}
 
+	/// Set the prefix for the enviornment override variable
 	setEnvOverridePrefix(envOverridePrefix: string) {
 		this.envOverridePrefix = envOverridePrefix;
 	}
@@ -150,7 +153,9 @@ export class EnvBuilder {
 		return compiler.compile();
 	}
 
-	/// Write the output to a list of files
+	/**
+	 * Write the output to a list of files
+	 */
 	async write(filenames: string[] | string) {
 		const output = await this.output();
 		filenames = [].concat(filenames).filter(Boolean);
@@ -198,6 +203,11 @@ export class EnvBuilder {
 			content: output.join("\n")
 		};
 	}
+
+	/**
+	 * Main entry for the env-builder
+	 * @param args The arguments from command line as an array
+	 */
 	static async main(args: string[]) {
 		const program = new Command();
 		const collect = (b: string, a: string[]) => a.concat(b);
