@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.6](https://github.com/renanhangai/env-builder/compare/v0.4.5...v0.4.6) (2020-06-09)
+
+
+### Features
+
+* Added uuidv4 on utility functionality ([d7ff713](https://github.com/renanhangai/env-builder/commit/d7ff713b069ce1c776dad5d77534719939058ee1))
+
 ### [0.4.5](https://github.com/renanhangai/env-builder/compare/v0.4.4...v0.4.5) (2020-04-28)
 
 
