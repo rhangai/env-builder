@@ -25,23 +25,63 @@ export class CompilerContext {
 		return this.data.seed;
 	}
 	/**
-	 *
+	 * Create a new context.
 	 * @param env
 	 */
 	async create(env: EnvMapCompiled, envName: string) {
 		let prng: MersenneTwister = null;
+		const getPrgn = () => {
+			if (!prng) {
+				const seed = `${envName}|${this.data.seed}`;
+				prng = new MersenneTwister(seed);
+			}
+			return prng;
+		};
 		return {
 			env: { ...env },
 			util: {
 				random: (n: number, alphabet?: string) => {
-					if (!prng) {
-						const seed = `${envName}|${this.data.seed}`;
-						prng = new MersenneTwister(seed);
-					}
-					return this.getRandom(prng, n, alphabet);
+					return this.getRandom(getPrgn(), n, alphabet);
+				},
+				uuidv4: () => {
+					const bytes = this.getRandomBytes(getPrgn(), 16);
+					bytes[6] = (bytes[6] & 0x0f) | 0x40;
+					bytes[8] = (bytes[8] & 0x3f) | 0x80;
+					const parts = [
+						bytes.slice(0, 4),
+						bytes.slice(4, 6),
+						bytes.slice(6, 8),
+						bytes.slice(8, 10),
+						bytes.slice(10, 16)
+					];
+					return parts.map(b => b.toString("hex")).join("-");
 				}
 			}
 		};
+	}
+	/**
+	 * Generate a new random bytes
+	 */
+	private getRandomBytes(prng: MersenneTwister, size: number): Buffer {
+		const buffer = Buffer.allocUnsafe(size);
+		let index = 0;
+		let rest = size;
+		while (rest >= 4) {
+			const n = prng.next();
+			buffer.writeUInt32LE(n, index);
+			rest -= 4;
+			index += 4;
+		}
+		if (rest > 0) {
+			let n = prng.next();
+			while (rest > 0) {
+				buffer[index] = n & 0xff;
+				++index;
+				--rest;
+				n = n >> 8;
+			}
+		}
+		return buffer;
 	}
 
 	/**
@@ -58,18 +98,7 @@ export class CompilerContext {
 		if (alphabet == null) {
 			alphabet = DEFAULT_ALPHABET;
 		}
-		const random = (size: number) => {
-			const bytes: number[] = [];
-			while (size >= 0) {
-				const n = prng.next();
-				bytes.push(n & 0xff);
-				bytes.push((n >>> 8) & 0xff);
-				bytes.push((n >>> 16) & 0xff);
-				bytes.push((n >>> 24) & 0xff);
-				size -= 4;
-			}
-			return bytes;
-		};
+		const random = (size: number) => this.getRandomBytes(prng, size);
 		return format(random, alphabet, n);
 	}
 }
