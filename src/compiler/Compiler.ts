@@ -4,7 +4,7 @@ import {
 	EnvMap,
 	EnvMapCompiled,
 	EnvFile,
-	EnvCompilationResult
+	EnvCompilationResult,
 } from "../Types";
 import { DepGraph } from "dependency-graph";
 import { CompilerContext } from "./CompilerContext";
@@ -86,7 +86,7 @@ export class Compiler {
 
 		return {
 			env: currentEnv,
-			seed: this.context.getSeed()
+			seed: this.context.getSeed(),
 		};
 	}
 
@@ -99,7 +99,7 @@ export class Compiler {
 		const context = await this.context.create(env, envName);
 		const result = await runInNewContext(expression, context);
 		if (result === false) return false;
-		if (result == null) return '';
+		if (result == null) return "";
 		return `${result}`;
 	}
 

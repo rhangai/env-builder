@@ -10,7 +10,7 @@ export function readFile(filename: string): Promise<string> {
 
 export function writeFile(filename: string, data: string): Promise<void> {
 	return new Promise((resolve, reject) => {
-		fsWriteFile(filename, data, "utf8", err => {
+		fsWriteFile(filename, data, "utf8", (err) => {
 			err ? reject(err) : resolve();
 		});
 	});

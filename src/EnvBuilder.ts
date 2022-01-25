@@ -27,7 +27,7 @@ export class EnvBuilder {
 	}
 
 	setSeedEnv(seedEnv: string) {
-		this.seedGetter = env => {
+		this.seedGetter = (env) => {
 			const envEntry = env[seedEnv];
 			if (!envEntry) return null;
 			if (!("value" in envEntry))
@@ -77,13 +77,13 @@ export class EnvBuilder {
 		}
 		const result = {
 			seed: null as string,
-			output: [] as string[]
+			output: [] as string[],
 		};
 		const data = JSON.parse(pkgContent);
 		const envBuilderData = data["env-builder"] || {};
 		if (envBuilderData.template) {
 			this.setTemplate({
-				filename: path.resolve(pkgDir, envBuilderData.template)
+				filename: path.resolve(pkgDir, envBuilderData.template),
 			});
 		}
 		if (envBuilderData.seed) {
@@ -102,7 +102,7 @@ export class EnvBuilder {
 		}
 		if (envBuilderData.output) {
 			let outputs = [].concat(envBuilderData.output).filter(Boolean);
-			result.output = outputs.map(o => path.resolve(pkgDir, o));
+			result.output = outputs.map((o) => path.resolve(pkgDir, o));
 		}
 		if (envBuilderData.modes) {
 			mode = mode || "dev";
@@ -112,7 +112,7 @@ export class EnvBuilder {
 			if (modes.indexOf(mode) < 0) {
 				throw new Error(
 					`Mode ${mode} does not exist. Modes available: ${modes
-						.map(m => `"${m}"`)
+						.map((m) => `"${m}"`)
 						.join(", ")}`
 				);
 			}
@@ -140,7 +140,7 @@ export class EnvBuilder {
 			try {
 				const inputEnvMap = await parser.parse(file);
 				envMap = { ...envMap, ...inputEnvMap };
-			} catch (err) {
+			} catch (err: any) {
 				if (err.code === "ENOENT") continue;
 				throw err;
 			}
@@ -159,10 +159,10 @@ export class EnvBuilder {
 	async write(filenames: string[] | string) {
 		const output = await this.output();
 		filenames = [].concat(filenames).filter(Boolean);
-		filenames = filenames.map(f => (f !== "-" ? path.resolve(f) : "-"));
+		filenames = filenames.map((f) => (f !== "-" ? path.resolve(f) : "-"));
 		filenames = Array.from(new Set(filenames));
 
-		const stdoutIndex = filenames.findIndex(f => f === "-");
+		const stdoutIndex = filenames.findIndex((f) => f === "-");
 		const hasStdout = stdoutIndex >= 0;
 		if (hasStdout) {
 			filenames.splice(stdoutIndex, 1);
@@ -187,7 +187,7 @@ export class EnvBuilder {
 			return {
 				env,
 				seed,
-				content: content
+				content: content,
 			};
 		}
 
@@ -200,7 +200,7 @@ export class EnvBuilder {
 		return {
 			env,
 			seed,
-			content: output.join("\n")
+			content: output.join("\n"),
 		};
 	}
 
@@ -280,7 +280,7 @@ export class EnvBuilder {
 						console.error("\n");
 					}
 				} catch (err) {
-					console.error(err.message);
+					console.error(err);
 					process.exit(1);
 				}
 			});

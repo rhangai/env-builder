@@ -52,11 +52,11 @@ export class CompilerContext {
 						bytes.slice(4, 6),
 						bytes.slice(6, 8),
 						bytes.slice(8, 10),
-						bytes.slice(10, 16)
+						bytes.slice(10, 16),
 					];
-					return parts.map(b => b.toString("hex")).join("-");
-				}
-			}
+					return parts.map((b) => b.toString("hex")).join("-");
+				},
+			},
 		};
 	}
 	/**
