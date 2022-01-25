@@ -35,7 +35,7 @@ export class TemplateCompiler {
 			const envValue = env[envName];
 			usedEnvs[envName] = true;
 			if (envValue !== false) {
-				output.push(`${envName}=${env[envName]}`);
+				output.push(`${envName}=${this.formatEnvValue(envValue)}`);
 			}
 		}
 
@@ -57,8 +57,8 @@ export class TemplateCompiler {
 	}
 
 	private formatEnvValue(value: string) {
-		if (value.includes("#") || value.includes('"')) {
-			return JSON.stringify(value);
+		if (value.includes("#") || value.includes('"') || value.includes("'")) {
+			return `'${value.replace(/\'/g, "'\\''")}'`;
 		}
 		return value;
 	}
