@@ -1,5 +1,7 @@
 {
   "name": "@rhangai/env-builder",
+  "repository": "git@github.com:renanhangai/env-builder.git",
+  "author": "renanhangai <hangai.renan@gmail.com>",
   "version": "0.4.6",
   "description": "Create .env files for your projects with a single command",
   "main": "dist/index.js",
@@ -12,24 +14,33 @@
     "dependency-graph": "^0.11.0",
     "dotenv": "^14.3.0",
     "nanoid": "^3.2.0",
-    "node-machine-id": "^1.1.12"
+    "node-machine-id": "^1.1.12",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/jest": "^27.4.0",
     "@types/node": "^17.0.12",
+    "@types/uuid": "^8.3.4",
+    "jest": "^27.4.7",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.5.1",
-    "rimraf": "^3.0.2",
+    "rimraf": "^3.0.1",
     "standard-version": "^9.3.2",
+    "ts-jest": "^27.1.3",
     "typescript": "^4.5.5"
   },
   "scripts": {
     "build": "run-s 'build:clean' 'build:compile'",
     "build:clean": "rimraf dist",
-    "build:compile": "tsc",
+    "build:compile": "tsc -p tsconfig.build.json",
     "build:watch": "run-s 'build:clean' 'build:compile --watch'",
     "prepare": "run-s build",
-    "release": "standard-version"
+    "release": "standard-version",
+    "test": "jest"
   },
-  "repository": "git@github.com:renanhangai/env-builder.git",
-  "author": "renanhangai <hangai.renan@gmail.com>"
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "rootDir": "src"
+  }
 }
