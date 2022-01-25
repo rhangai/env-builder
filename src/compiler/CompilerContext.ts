@@ -3,6 +3,7 @@ import { EnvMapCompiled, EnvFile } from "../Types";
 import * as format from "nanoid/format";
 import { MersenneTwister } from "../util/MersenneTwister";
 import { machineId } from "node-machine-id";
+import { v4 as uuidv4 } from "uuid";
 
 const DEFAULT_ALPHABET =
 	"0123456789abcdefghijklmnopqrstuvwxyzABCDEFHIJKLMNOPQRSTUVXYZ_";
@@ -44,19 +45,11 @@ export class CompilerContext {
 					return this.getRandom(getPrgn(), n, alphabet);
 				},
 				uuidv4: () => {
-					const bytes = this.getRandomBytes(getPrgn(), 16);
-					bytes[6] = (bytes[6] & 0x0f) | 0x40;
-					bytes[8] = (bytes[8] & 0x3f) | 0x80;
-					const parts = [
-						bytes.slice(0, 4),
-						bytes.slice(4, 6),
-						bytes.slice(6, 8),
-						bytes.slice(8, 10),
-						bytes.slice(10, 16)
-					];
-					return parts.map(b => b.toString("hex")).join("-");
-				}
-			}
+					return uuidv4({
+						random: this.getRandomBytes(getPrgn(), 16),
+					});
+				},
+			},
 		};
 	}
 	/**
