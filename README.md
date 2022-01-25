@@ -1,6 +1,6 @@
 # Basic usage
 
-Install using `yarn add @renanhangai/env-builder`
+Install using `yarn add @rhangai/env-builder`
 
 Create a `template.env`
 
@@ -57,7 +57,7 @@ You can simplify the usage of the scripts simply by creating the `env-builder` e
 ```js
 {
 	"devDependencies": {
-		"@renanhangai/env-builder": "^0.4.0"
+		"@rhangai/env-builder": "^0.4.0"
 	},
 	"scripts": {
 		"env": "env-builder generate --package --",
@@ -88,4 +88,5 @@ MY_ENV={{ env.OTHER_ENV + util.random(64) }}
 ```
 
 Util:
-- util.random(n, alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFHIJKLMNOPQRSTUVXYZ_'): Generates a random string of length n
+
+-   util.random(n, alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFHIJKLMNOPQRSTUVXYZ\_'): Generates a random string of length n
