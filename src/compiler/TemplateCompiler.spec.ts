@@ -23,6 +23,11 @@ const TEST: TemplateCompilerTest[] = [
 		input: "VAR=",
 		expected: "VAR='\"oi'",
 	},
+	{
+		env: { VAR: "\"\\'oi" },
+		input: "VAR=",
+		expected: "VAR='\"\\'oi'",
+	},
 ];
 
 describe("TemplateCompiler", () => {

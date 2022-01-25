@@ -58,7 +58,9 @@ export class TemplateCompiler {
 
 	private formatEnvValue(value: string) {
 		if (value.includes("#") || value.includes('"') || value.includes("'")) {
-			return `'${value.replace(/\'/g, "'\\''")}'`;
+			if (value.match(/(?<!\\)'/))
+				throw new Error(`Please escape your single quotes`);
+			return `'${value}'`;
 		}
 		return value;
 	}
