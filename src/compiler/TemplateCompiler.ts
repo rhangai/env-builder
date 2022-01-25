@@ -49,11 +49,18 @@ export class TemplateCompiler {
 				}
 				hasOtherVars = true;
 				if (envValue !== false) {
-					output.push(`${envName}=${env[envName]}`);
+					output.push(`${envName}=${this.formatEnvValue(envValue)}`);
 				}
 			}
 		}
 		return output.join("\n");
+	}
+
+	private formatEnvValue(value: string) {
+		if (value.includes("#") || value.includes('"')) {
+			return JSON.stringify(value);
+		}
+		return value;
 	}
 
 	private parseEnvLine(line: string) {
