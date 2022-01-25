@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/renanhangai/env-builder/compare/v0.4.6...v0.5.0) (2022-01-25)
+
+
+### Features
+
+* Implemented escaping on env characters ([071b382](https://github.com/renanhangai/env-builder/commit/071b382e637a03820d811705f32cc74546dd89ba))
+
+
+### Bug Fixes
+
+* Formatting of env variables when including special symbols ([f2f1db7](https://github.com/renanhangai/env-builder/commit/f2f1db7164a492f3252c6b1144d7c07faf2ca36f))
+
 ### [0.4.6](https://github.com/renanhangai/env-builder/compare/v0.4.5...v0.4.6) (2020-06-09)
 
 

@@ -2,7 +2,7 @@
   "name": "@rhangai/env-builder",
   "repository": "git@github.com:renanhangai/env-builder.git",
   "author": "renanhangai <hangai.renan@gmail.com>",
-  "version": "0.4.6",
+  "version": "0.5.0",
   "description": "Create .env files for your projects with a single command",
   "main": "dist/index.js",
   "license": "MIT",
