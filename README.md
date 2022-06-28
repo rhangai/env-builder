@@ -90,3 +90,5 @@ MY_ENV={{ env.OTHER_ENV + util.random(64) }}
 Util:
 
 -   util.random(n, alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFHIJKLMNOPQRSTUVXYZ\_'): Generates a random string of length n
+-   util.randomBase64(n): N random bytes, base64 encoded
+-   util.randomHex(n): N random bytes, hex encoded

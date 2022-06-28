@@ -43,6 +43,12 @@ export class CompilerContext {
 				random: (n: number, alphabet?: string) => {
 					return this.getRandom(getPrgn(), n, alphabet);
 				},
+				randomBase64: (n: number) => {
+					return this.getRandomBytes(getPrgn(), n).toString("base64");
+				},
+				randomHex: (n: number) => {
+					return this.getRandomBytes(getPrgn(), n).toString("hex");
+				},
 				uuidv4: () => {
 					return uuidv4({
 						random: this.getRandomBytes(getPrgn(), 16),
