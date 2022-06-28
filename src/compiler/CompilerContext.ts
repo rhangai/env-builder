@@ -46,6 +46,13 @@ export class CompilerContext {
 				randomBase64: (n: number) => {
 					return this.getRandomBytes(getPrgn(), n).toString("base64");
 				},
+				randomUrlSafeBase64: (n: number) => {
+					return this.getRandomBytes(getPrgn(), n)
+						.toString("base64")
+						.replace(/=/g, "")
+						.replace(/\+/g, "-")
+						.replace(/\//g, "_");
+				},
 				randomHex: (n: number) => {
 					return this.getRandomBytes(getPrgn(), n).toString("hex");
 				},
